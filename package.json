@@ -46,6 +46,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "bufferpack": "0.0.6",
     "chalk": "^4.0.0",
     "elliptic": "^6.5.2",
     "express": "^4.17.1",
