@@ -57,7 +57,7 @@
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
     "node-wifi": "^2.0.14",
-    "opn": "^6.0.0",
+    "open": "^6.0.0",
     "ora": "^5.1.0",
     "puppeteer-core": "^3.0.4",
     "semver": "^7.3.2",
