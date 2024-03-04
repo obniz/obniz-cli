@@ -1,6 +1,8 @@
 import chalk from "chalk";
 import wifi from "node-wifi";
-import ora, { Ora } from "ora";
+import { Ora } from "ora";
+import { getOra } from "../../ora-console/getora";
+const ora = getOra();
 import { NetworkInterfaceInfo, networkInterfaces } from "os";
 import config from "../config";
 
@@ -16,15 +18,21 @@ export default class WiFi {
     });
   }
 
-  public async setNetwork(configs: any, duplicate: boolean = true) {
+  public async setNetwork(configs: any, duplicate: boolean = true, signal?: AbortSignal) {
     let spinner;
     const successIds = [];
     while (true) {
       try {
+        if (signal?.aborted) {
+          break;
+        }
         spinner = ora(`Wi-Fi Scanning...`).start();
         let networks;
         while (true) {
           networks = await this.scanObnizWiFi(30 * 1000);
+          if (signal?.aborted) {
+            throw new Error(`Aborted.`);
+          }
           if (networks.length === 0) {
             continue;
           }
@@ -335,11 +343,16 @@ export default class WiFi {
     return options;
   }
 
-  private scanObnizWiFi(timeout: number): Promise<any> {
+  private scanObnizWiFi(timeout: number, signal?: AbortSignal): Promise<any> {
     return new Promise(async (resolve, reject) => {
       const timer = setTimeout(() => {
         reject(new Error(`Timeout. Cannot find any connectable obniz.`));
       }, timeout);
+
+      signal?.addEventListener("abort", () => {
+        clearTimeout(timer);
+        reject(new Error(`Aborted.`));
+      });
 
       wifi.scan((error: Error | null, networks: any[]) => {
         if (error) {

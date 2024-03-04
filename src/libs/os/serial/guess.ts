@@ -2,7 +2,8 @@ import SerialPort from "serialport";
 
 export default async () => {
   let portname;
-  const availablePorts = await findUsbSerials();
+  const serialInfo = await findUsbSerials();
+  const availablePorts = serialInfo.availablePorts;
   if (availablePorts.length === 0) {
     // not found
   } else if (availablePorts.length === 1) {
@@ -14,10 +15,15 @@ export default async () => {
     }
     portname = availablePorts[0];
   }
-  return portname;
+  return { portname, ports: serialInfo.ports };
 };
 
-async function findUsbSerials(): Promise<string[]> {
+interface ISerialInfo {
+  availablePorts: string[];
+  ports: SerialPort.PortInfo[];
+}
+
+async function findUsbSerials(): Promise<ISerialInfo> {
   const availablePorts: string[] = [];
   const ports: SerialPort.PortInfo[] = await SerialPort.list();
   for (const port of ports) {
@@ -35,5 +41,5 @@ async function findUsbSerials(): Promise<string[]> {
       break;
     }
   }
-  return availablePorts;
+  return { availablePorts, ports };
 }

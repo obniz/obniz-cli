@@ -2,7 +2,7 @@ import guessPort from "./guess";
 
 export default async function waitForPort() {
   while (true) {
-    const portPath = await guessPort();
+    const portPath = (await guessPort()).portname;
     if (portPath) {
       return portPath;
     }

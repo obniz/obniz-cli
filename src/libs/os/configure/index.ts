@@ -7,7 +7,9 @@ import { OperationSetting } from "../../obnizio/operation_setting";
 import * as Storage from "../../storage";
 import Serial from "../serial";
 
-import ora, { Ora } from "ora";
+import { Ora } from "ora";
+import { getOra } from "../../ora-console/getora";
+const ora = getOra();
 
 export interface ConfigParam {
   token: string;

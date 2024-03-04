@@ -8,7 +8,8 @@ const defaults_1 = __importDefault(require("../../../defaults"));
 const guess_1 = __importDefault(require("./guess"));
 const chalk_1 = __importDefault(require("chalk"));
 const inquirer_1 = __importDefault(require("inquirer"));
-const ora_1 = __importDefault(require("ora"));
+const getora_1 = require("../../ora-console/getora");
+const ora = getora_1.getOra();
 exports.default = async (args) => {
     let portname = args.p || args.port;
     if (!portname) {
@@ -36,7 +37,7 @@ exports.default = async (args) => {
     }
     // not specified or not found
     if (!portname) {
-        const guessed_portname = await guess_1.default();
+        const guessed_portname = (await guess_1.default()).portname;
         if (autoChoose) {
             portname = guessed_portname;
         }
@@ -50,8 +51,8 @@ exports.default = async (args) => {
         baud = defaults_1.default.BAUD;
     }
     const debugserial = args.debugserial;
-    const spinner = ora_1.default("Serial Port:").start();
-    spinner.succeed(`Serial Port: decided ${chalk_1.default.green(portname)} baundrate ${baud}`);
+    const spinner = ora("Serial Port:").start();
+    spinner.succeed(`Serial Port: decided ${chalk_1.default.green(portname)} baudrate ${baud}`);
     return {
         portname,
         baud,

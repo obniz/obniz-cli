@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import fs from "fs";
-import ora from "ora";
 import path from "path";
 import Defaults from "../../defaults";
 import Device from "../obnizio/device";

@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const node_wifi_1 = __importDefault(require("node-wifi"));
-const ora_1 = __importDefault(require("ora"));
+const getora_1 = require("../../ora-console/getora");
+const ora = getora_1.getOra();
 const os_1 = require("os");
 class WiFi {
     constructor(obj) {
@@ -15,15 +16,21 @@ class WiFi {
             iface: null,
         });
     }
-    async setNetwork(configs, duplicate = true) {
+    async setNetwork(configs, duplicate = true, signal) {
         let spinner;
         const successIds = [];
         while (true) {
             try {
-                spinner = ora_1.default(`Wi-Fi Scanning...`).start();
+                if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+                    break;
+                }
+                spinner = ora(`Wi-Fi Scanning...`).start();
                 let networks;
                 while (true) {
                     networks = await this.scanObnizWiFi(30 * 1000);
+                    if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+                        throw new Error(`Aborted.`);
+                    }
                     if (networks.length === 0) {
                         continue;
                     }
@@ -35,7 +42,7 @@ class WiFi {
                         continue;
                     }
                     if (i !== 0) {
-                        spinner = ora_1.default(``).start();
+                        spinner = ora(``).start();
                     }
                     try {
                         // Connect access point
@@ -325,11 +332,15 @@ class WiFi {
         }
         return options;
     }
-    scanObnizWiFi(timeout) {
+    scanObnizWiFi(timeout, signal) {
         return new Promise(async (resolve, reject) => {
             const timer = setTimeout(() => {
                 reject(new Error(`Timeout. Cannot find any connectable obniz.`));
             }, timeout);
+            signal === null || signal === void 0 ? void 0 : signal.addEventListener("abort", () => {
+                clearTimeout(timer);
+                reject(new Error(`Aborted.`));
+            });
             node_wifi_1.default.scan((error, networks) => {
                 if (error) {
                     clearTimeout(timer);

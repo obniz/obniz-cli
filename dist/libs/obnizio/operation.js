@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Operation = void 0;
 const sdk_1 = require("./sdk");
 class Operation {
     static async getList(token) {

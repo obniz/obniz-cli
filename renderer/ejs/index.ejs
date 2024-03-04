@@ -1,0 +1,34 @@
+<%- include('_header.ejs', {disableUserMenu: true, includes: ['top.js']}); %>
+<div class="fixed-contents">
+  <div class="card text-center height100">
+    <div class="card-body height100">
+      <div class="auth_box-inner w-30 h-40 box-center-middle">
+        <div class="text-center">
+          <button class="d-block w-100 btn btn-primary btn-lg" id="login">
+            Sign-in to obniz Cloud
+          </button>
+        </div>
+        <div class="text-center">
+          <a type="button" href="https://obniz.com/ja/users/signup" class="btn text-primary" id="signup" target="_blank">
+            Signup
+          </a>
+        </div>
+
+        <div class="signinseparator">
+          <span>or</span>
+        </div>
+
+        <div class="auth-container-wrap">
+          <input id="api_key" placeholder="Enter API key"><br>
+          <button id="api_login" class="btn btn-secondary btn-mid"> Start with API key</button>
+        </div>
+
+        <div class="alert alert-danger" role="alert" id="result" style="display:none;"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('_upgrade.ejs'); %>
+<%- include('_invalid_token_modal.ejs'); %>
+<%- include('_footer.ejs'); %>

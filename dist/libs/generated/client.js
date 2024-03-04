@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSdk = exports.CurrentUserDocument = exports.GetTokenPermissionDocument = exports.UpdateOperationSettingStatusDocument = exports.RemoveOperationResultDocument = exports.GetOperationsDocument = exports.GetOperationSettingsDocument = exports.GetOperationDocument = exports.CreateOperationResultDocument = exports.GetDeviceByIdDocument = exports.CreateDeviceDocument = void 0;
 const graphql_1 = require("graphql");
 const graphql_tag_1 = __importDefault(require("graphql-tag"));
 exports.CreateDeviceDocument = graphql_tag_1.default `

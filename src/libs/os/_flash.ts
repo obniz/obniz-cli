@@ -1,8 +1,14 @@
+import { EspLoader } from "@9wick/esptool.js";
+import { EsptoolSerial } from "@9wick/esptool.js/build/node/serial";
+import { sleep } from "@9wick/esptool.js/build/util";
 import chalk from "chalk";
 import child_process from "child_process";
-import OS from "../obnizio/os";
+import { promises as fs } from "fs";
 
-import ora from "ora";
+import { getOra } from "../ora-console/getora";
+const ora = getOra();
+
+import OS from "../obnizio/os";
 
 export default function flash(obj: {
   portname: string;
@@ -30,7 +36,7 @@ export default function flash(obj: {
     let received = "";
 
     const cmd =
-      `esptool.py --chip esp32 --port "${obj.portname}" --baud ${obj.baud} --before default_reset --after hard_reset` +
+      `esptool.py --chip auto --port "${obj.portname}" --baud ${obj.baud} --before default_reset --after hard_reset` +
       ` write_flash` +
       ` -z --flash_mode dio --flash_freq 40m --flash_size detect` +
       ` 0x1000 "${files.bootloader_path}"` +
@@ -51,6 +57,7 @@ export default function flash(obj: {
     const child = child_process.exec(cmd);
     child.stdout?.setEncoding("utf8");
     child.stdout?.on("data", (text) => {
+      // console.log(text);
       if (obj.debugserial) {
         console.log(text);
         obj.stdout(text);

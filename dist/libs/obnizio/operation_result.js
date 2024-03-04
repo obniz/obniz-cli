@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OperationResult = void 0;
 const sdk_1 = require("./sdk");
 class OperationResult {
     static async createWriteSuccess(token, operationSettingId, obnizId) {

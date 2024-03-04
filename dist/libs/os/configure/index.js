@@ -1,13 +1,25 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
@@ -16,7 +28,8 @@ const operation_result_1 = require("../../obnizio/operation_result");
 const operation_setting_1 = require("../../obnizio/operation_setting");
 const Storage = __importStar(require("../../storage"));
 const serial_1 = __importDefault(require("../serial"));
-const ora_1 = __importDefault(require("ora"));
+const getora_1 = require("../../ora-console/getora");
+const ora = getora_1.getOra();
 exports.default = async (obj) => {
     var _a, _b;
     // Return if no configs required
@@ -51,7 +64,7 @@ exports.default = async (obj) => {
         },
     });
     let received = "";
-    let spinner = ora_1.default(`Configure: Opening Serial Port ${chalk_1.default.green(obj.portname)}`).start();
+    let spinner = ora(`Configure: Opening Serial Port ${chalk_1.default.green(obj.portname)}`).start();
     if (obj.debugserial) {
         spinner.stop();
     }
@@ -135,7 +148,7 @@ exports.default = async (obj) => {
 };
 function nextSpinner(spinner, text, debugserial) {
     spinner.succeed();
-    spinner = ora_1.default(text).start();
+    spinner = ora(text).start();
     if (debugserial) {
         spinner.stop();
     }

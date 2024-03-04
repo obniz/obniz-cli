@@ -6,7 +6,8 @@ import SerialGuess from "./guess";
 
 import chalk from "chalk";
 import inquirer from "inquirer";
-import ora from "ora";
+import { getOra } from "../../ora-console/getora";
+const ora = getOra();
 
 export default async (args: any): Promise<any> => {
   let portname: string | undefined = args.p || args.port;
@@ -38,7 +39,7 @@ export default async (args: any): Promise<any> => {
 
   // not specified or not found
   if (!portname) {
-    const guessed_portname = await SerialGuess();
+    const guessed_portname = (await SerialGuess()).portname;
     if (autoChoose) {
       portname = guessed_portname;
     }
@@ -57,7 +58,7 @@ export default async (args: any): Promise<any> => {
   const debugserial: any = args.debugserial;
 
   const spinner = ora("Serial Port:").start();
-  spinner.succeed(`Serial Port: decided ${chalk.green(portname)} baundrate ${baud}`);
+  spinner.succeed(`Serial Port: decided ${chalk.green(portname)} baudrate ${baud}`);
 
   return {
     portname,

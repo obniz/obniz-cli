@@ -1,0 +1,176 @@
+<div id="settings_tab" class="tab-pane active">
+    <div class="flex-row-container">
+        <div class="w-80">
+            <h2>Create / Update Device</h2>
+        </div>
+    </div>
+
+    <hr class="w-95">
+
+
+    <div class="flex-row-container">
+        <div class="w-80">
+            <input type="checkbox" id="whether_write" checked>
+            <label for="whether_write">Write obnizOS</label>
+            <div id="write_switcher" class="switch-container">
+                <div class="form-label">
+                    <p class="w-100">
+                        <label for="hardware">Choose Hardware</label>
+                        <select type="text" id="hardware" class="w-60">
+                        </select>
+                    </p>
+                </div>
+                <div class="form-label">
+                    <p class="w-100">
+                        <label for="os_ver">Choose OS ver.</label>
+                        <select type="text" id="os_ver" class="w-60">
+                        </select>
+                    </p>
+                </div>
+
+
+                <div class="radio-container">
+                    <form id="write_options">
+                        <p>
+                            <input id="new_device" type="radio" name="target_device" value="new" checked>
+                            <label for="new_device">Create New Device</label>
+                        </p>
+
+                        <p>
+                            <input id="pregenerated_device" type="radio" name="target_device" value="pregenerated">
+                            <label for="pregenerated_device">Write a pre-generated device</label>
+                        </p>
+
+                        <p>
+                            <input id="os_only" type="radio" name="target_device" value="os_only">
+                            <label for="os_only">Write obnizOS only</label>
+                        </p>
+
+                    </form>
+                </div>
+
+
+                <div id="targetDeviceTab" class="tab-content tab-content-indent">
+                    <div id="newDevice" class="tab-pane active">
+
+                        <div class="mx-8">
+                            <p>
+                                <input id="using_qr" type="checkbox" name="using_radio" checked>
+                                <label for="using_qr">Link to QR code</label>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="existingDevice" class="tab-pane">
+                        <div class="form-label">
+                            <p class="w-100">
+                                <label for="obniz_id">obniz ID</label>
+                                <input type="text" id="obniz_id" class="w-60" placeholder="1234-5678">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="specific_settings">
+                <input type="checkbox" id="whether_configure" checked>
+                <label for="whether_configure">Write Config</label>
+                <div id="config_switcher" class="switch-container">
+
+                    <div class="radio-container">
+                        <form id="automatic_options">
+                            <p>
+                                <input id="auto_operation" type="radio" name="setting_type" value="same" checked>
+                                <label for="auto_operation">Using Operation</label>
+                            </p>
+                            <p>
+                                <input id="auto_indivisual" type="radio" name="setting_type" value="individual">
+                                <label for="auto_indivisual">Set individually</label>
+                            </p>
+                        </form>
+                    </div>
+
+                    <div id="automatic_settings" class="tab-content">
+                        <div id="same" class="tab-pane active">
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="op_name">Operation name</label>
+                                    <input type="text" id="op_name" class="w-60">
+                                </p>
+                            </div>
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="indication_id">Indication ID</label>
+                                    <input type="text" id="indication_id" class="w-60">
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="individual" class="tab-pane">
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="description">Description</label>
+                                    <input type="text" id="description" class="w-60">
+                                </p>
+                            </div>
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="config_json">Configuration JSON</label>
+                                    <button id="config_json" class="btn btn-outline-primary col-2">Choose File</button>
+                                    <span id="filename">No File Chosen</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card flex-row-container mx-2">
+        <div class="card-body color-gray">
+            <div class="row g-1">
+                <div class="col-auto">
+                    <label for="device"><i class="fab fa-usb"></i> COM:</label>
+                    <select type="text" id="device" class="input-wid10"></select>
+                </div>
+                <div class="col-auto">
+                    <label for="baudrate">Baudrate:</label>
+                    <select type="text" id="baudrate" class="input-wid10">
+                        <option value="115200">115200bps</option>
+                        <option value="921600">921600bps</option>
+                        <option value="1500000" selected>1500000bps</option>
+                    </select>
+                </div>
+                <div class="col-auto ms-auto">
+                    <button type="button" class="btn btn-secondary m-0" data-bs-toggle="modal"
+                            data-bs-target="#eraseModal">Erase
+                    </button>
+                </div>
+
+                <div class="col-auto">
+                    <button id="write_btn" type="button" class="btn btn-primary m-0 input-wid10">Write</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <hr class="w-100">
+    <div class="flex-row-container">
+        <div class="w-80">
+            <h2>Configure Devices via WiFi</h2>
+        </div>
+    </div>
+
+    <div class="flex-row-container">
+        <div class="w-80 flex-row-container align-items-center ms-4">
+            <label for="wifi_config_json">Configuration JSON</label>
+            <button id="wifi_config_json" class="btn ms-auto btn-outline-primary">Choose File</button>
+            <span id="wifi_config_filename" class="me-2" >No File Chosen</span>
+        </div>
+
+        <div class="w-20">
+            <button disabled id="wifi_config_btn" type="button" class="btn btn-primary btn-mid w-80">Configure</button>
+        </div>
+    </div>
+</div>

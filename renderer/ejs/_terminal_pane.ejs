@@ -1,0 +1,38 @@
+<div id="terminal_tab" class="tab-pane">
+  <div class="flex-row-container">
+    <div class="w-80">
+      <h2>Create / Update Device</h2>
+    </div>
+    <div class="w-20">
+      <button id="erase_btn" type="button" class="btn btn-thirdly btn-mid w-80" data-bs-toggle="modal" data-bs-target="#eraseModal">Erase</button>
+    </div>
+  </div>
+
+  <hr class="w-95">
+
+  <div class="flex-row-container">
+    <div class="w-80">
+      <div class="inner-card color-gray">
+        <ul id="config_specification">
+          <li>Hardware: esp32w</li>
+          <li>OS ver: esp32w - 3.5.0 [latest]</li>
+          <li>Create new device</li>
+          <li>Link to QR code</li>
+          <li>Automatic Setting: Using Operation</li>
+          <li>Operation name: xxxxxxx</li>
+          <li>Indication ID: xxxxxxx-001</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="w-20">
+      <button id="write_btn" type="button" class="btn btn-primary btn-mid w-80" >Write</button>
+      <button id="back_to_setting" type="button" class="btn btn-secondary btn-mid w-80">Back to Settings</button>
+    </div>
+  </div>
+
+  <%- include('_progress.ejs') %>
+  <div style="display: flex;justify-content: center; margin: 20px 0 50px;" >
+    <div class="bg-terminal" style=" padding: 10px 20px;"  id="terminal"></div>
+  </div>
+</div>

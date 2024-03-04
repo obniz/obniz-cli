@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const guess_1 = __importDefault(require("./guess"));
 async function waitForPort() {
     while (true) {
-        const portPath = await guess_1.default();
+        const portPath = (await guess_1.default()).portname;
         if (portPath) {
             return portPath;
         }

@@ -1,0 +1,32 @@
+<%- include('_header.ejs') %>
+<script src="./assets/javascript/device.js"></script>
+<script src="./assets/javascript/settings.js"></script>
+
+<script language="javascript">
+  function obniz_erase() {
+    const devicePort = $('#device').val();
+    const baudrate = parseInt($('#baudrate').val());
+    window.electron.erase({device: devicePort, baudrate: baudrate});
+  }
+</script>
+<div class="fixed-contents">
+  <div class="flex-column-container">
+    <div class="card">
+      <div class="card-body">
+        <div id="main_tab" class="tab-content">
+          <%- include('./_terminal_pane.ejs') %>
+          <%- include('./_settings_pane.ejs') %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('_erase_modal.ejs') %>
+<%- include('_write_modal.ejs') %>
+<%- include('./_wifi_config_modal.ejs') %>
+<%- include('_error_modal.ejs') %>
+
+<script src="./assets/javascript/console.js"></script>
+<script src="./assets/javascript/wifi_console.js"></script>
+<%- include('_footer.ejs') %>

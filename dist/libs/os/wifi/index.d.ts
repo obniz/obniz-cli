@@ -5,7 +5,7 @@ export default class WiFi {
         stdout: any;
         onerror: any;
     });
-    setNetwork(configs: any, duplicate?: boolean): Promise<void>;
+    setNetwork(configs: any, duplicate?: boolean, signal?: AbortSignal): Promise<void>;
     private setForUnder350Devices;
     /**
      * setting configration for OS3.5.0 or older

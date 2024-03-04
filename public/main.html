@@ -1,0 +1,519 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="css/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+          integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css"/>
+    <link rel="stylesheet" href="./css/primary.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ejs@3.1.6/ejs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+            crossorigin="anonymous"></script>
+    <script src="./assets/javascript/index.js"></script>
+    <script src="./assets/javascript/version.js"></script>
+
+    
+    
+
+    <script src="./assets/javascript/userinfo.js"></script>
+</head>
+<body>
+<div class="fixed-top titlebar-flex">
+    <nav class="titlebar bg-titlebar">
+        <a class="navbar-brand">obniz Writer</a>
+
+        <span class="dropdown">
+          <a id="version" class="text-white" href="#" role="button" id="versionDropdownMenu" data-bs-toggle="dropdown"
+             data-bs-display="static" aria-expanded="false">
+            Ver. x.x.x
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="versionDropdownMenu">
+            <div id="versioninfo" class="version-info">
+              <ul>
+                <li>Version:</li>
+                <li>
+                  <ul>
+                    <li>Current: Ver. x.x.x</li>
+                    <li>Latest: Ver. x.x.x</li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+            <li>
+              <a class="dropdown-item text-primary" href="https://obniz.com/" target="_blank">Update</a>
+            </li>
+              </ul>
+
+        </span>
+    </nav>
+    <div class="dropdown">
+        
+        
+        <a class="system user-menu" href="#" role="button" id="dropdownMenuButton"
+           data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+        </a>
+        <ul class="dropdown-menu dropdown-menu-center" aria-labelledby="dropdownMenuButton">
+            <div id="userinfo" class="user-account">
+                <ul>
+                    <li>User:</li>
+                    <li>
+                        <ul>
+                            <li>admin2@example.com</li>
+<!--                            <li><a href="#">update account</a></li>-->
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <li><a id="signout" class="dropdown-item text-primary" href="#">Signout</a></li>
+        </ul>
+    </div>
+    <span id="minimize" class="system system-minimize"></span>
+    <span id="maximize" class="system system-maximize"></span>
+    <span id="quit" class="system system-close"></span>
+</div>
+
+<script src="./assets/javascript/device.js"></script>
+<script src="./assets/javascript/settings.js"></script>
+
+<script language="javascript">
+  function obniz_erase() {
+    const devicePort = $('#device').val();
+    const baudrate = parseInt($('#baudrate').val());
+    window.electron.erase({device: devicePort, baudrate: baudrate});
+  }
+</script>
+<div class="fixed-contents">
+  <div class="flex-column-container">
+    <div class="card">
+      <div class="card-body">
+        <div id="main_tab" class="tab-content">
+          <div id="terminal_tab" class="tab-pane">
+  <div class="flex-row-container">
+    <div class="w-80">
+      <h2>Create / Update Device</h2>
+    </div>
+    <div class="w-20">
+      <button id="erase_btn" type="button" class="btn btn-thirdly btn-mid w-80" data-bs-toggle="modal" data-bs-target="#eraseModal">Erase</button>
+    </div>
+  </div>
+
+  <hr class="w-95">
+
+  <div class="flex-row-container">
+    <div class="w-80">
+      <div class="inner-card color-gray">
+        <ul id="config_specification">
+          <li>Hardware: esp32w</li>
+          <li>OS ver: esp32w - 3.5.0 [latest]</li>
+          <li>Create new device</li>
+          <li>Link to QR code</li>
+          <li>Automatic Setting: Using Operation</li>
+          <li>Operation name: xxxxxxx</li>
+          <li>Indication ID: xxxxxxx-001</li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="w-20">
+      <button id="write_btn" type="button" class="btn btn-primary btn-mid w-80" >Write</button>
+      <button id="back_to_setting" type="button" class="btn btn-secondary btn-mid w-80">Back to Settings</button>
+    </div>
+  </div>
+
+  <style type="text/css">
+.bs-wizard {margin-top: 40px;}
+
+/*Form Wizard*/
+.bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;}
+.bs-wizard > .bs-wizard-step {padding: 0; position: relative;}
+.bs-wizard > .bs-wizard-step + .bs-wizard-step {}
+.bs-wizard > .bs-wizard-step .bs-wizard-stepnum {color: #595959; font-size: 16px; margin-bottom: 5px;}
+.bs-wizard > .bs-wizard-step .bs-wizard-info {color: #999; font-size: 14px;}
+.bs-wizard > .bs-wizard-step > .bs-wizard-dot {position: absolute; width: 15px; height: 15px; display: block; background: #1D445A; top: 47px; left: 50%; margin-top: -7.5px; margin-left: -7.5px; border-radius: 50%;} 
+.bs-wizard > .bs-wizard-step > .progress {position: relative; border-radius: 0px; height: 4px; box-shadow: none; margin: 20px 0;}
+.bs-wizard > .bs-wizard-step > .progress > .progress-bar {width:0px; box-shadow: none; background: #1D445A;}
+.bs-wizard > .bs-wizard-step.complete > .progress > .progress-bar {width:100%;}
+.bs-wizard > .bs-wizard-step.active > .progress > .progress-bar {width:50%;}
+.bs-wizard > .bs-wizard-step:first-child.active > .progress > .progress-bar {width:0%;}
+.bs-wizard > .bs-wizard-step:last-child.active > .progress > .progress-bar {width: 100%;}
+.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot {background-color: #f5f5f5;}
+.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot:after {opacity: 0;}
+.bs-wizard > .bs-wizard-step:first-child  > .progress {left: 50%; width: 50%;}
+.bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}
+.bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none; }
+.progress-w50 {
+  width: 50%;
+}
+.progress-bar-w100 {
+   width: 100% !important;
+ }
+/*END Form Wizard*/
+</style>
+
+<div class="row bs-wizard" style="border-bottom:0;">
+  <div class="col-3 bs-wizard-step disabled">
+    <div class="text-center bs-wizard-stepnum">Step 1</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div> <a href="#" class="bs-wizard-dot"></a>
+    <div class="bs-wizard-info text-center">Connecting</div>
+  </div>
+  <div class="col-3 bs-wizard-step disabled">
+    <div class="text-center bs-wizard-stepnum">Step 2</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div> <a href="#" class="bs-wizard-dot"></a>
+    <div class="bs-wizard-info text-center">Decided hardware and OS version</div>
+  </div>
+  <div class="col-3 bs-wizard-step disabled" id="progress-step-3">
+    <div class="text-center bs-wizard-stepnum">Step 3</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div> <a href="#" class="bs-wizard-dot"></a>
+    <div class="bs-wizard-info text-center">Writing OS</div>
+  </div>
+  <div class="col-3 bs-wizard-step disabled" id="progress-step-4">
+    <div class="text-center bs-wizard-stepnum">Step 4</div>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div> <a href="#" class="bs-wizard-dot"></a>
+    <div class="bs-wizard-info text-center">Writing Configuration</div>
+  </div>
+</div>
+
+<script src="./assets/javascript/progress.js"></script>
+
+  <div style="display: flex;justify-content: center; margin: 20px 0 50px;" >
+    <div class="bg-terminal" style=" padding: 10px 20px;"  id="terminal"></div>
+  </div>
+</div>
+
+          <div id="settings_tab" class="tab-pane active">
+    <div class="flex-row-container">
+        <div class="w-80">
+            <h2>Create / Update Device</h2>
+        </div>
+    </div>
+
+    <hr class="w-95">
+
+
+    <div class="flex-row-container">
+        <div class="w-80">
+            <input type="checkbox" id="whether_write" checked>
+            <label for="whether_write">Write obnizOS</label>
+            <div id="write_switcher" class="switch-container">
+                <div class="form-label">
+                    <p class="w-100">
+                        <label for="hardware">Choose Hardware</label>
+                        <select type="text" id="hardware" class="w-60">
+                        </select>
+                    </p>
+                </div>
+                <div class="form-label">
+                    <p class="w-100">
+                        <label for="os_ver">Choose OS ver.</label>
+                        <select type="text" id="os_ver" class="w-60">
+                        </select>
+                    </p>
+                </div>
+
+
+                <div class="radio-container">
+                    <form id="write_options">
+                        <p>
+                            <input id="new_device" type="radio" name="target_device" value="new" checked>
+                            <label for="new_device">Create New Device</label>
+                        </p>
+
+                        <p>
+                            <input id="pregenerated_device" type="radio" name="target_device" value="pregenerated">
+                            <label for="pregenerated_device">Write a pre-generated device</label>
+                        </p>
+
+                        <p>
+                            <input id="os_only" type="radio" name="target_device" value="os_only">
+                            <label for="os_only">Write obnizOS only</label>
+                        </p>
+
+                    </form>
+                </div>
+
+
+                <div id="targetDeviceTab" class="tab-content tab-content-indent">
+                    <div id="newDevice" class="tab-pane active">
+
+                        <div class="mx-8">
+                            <p>
+                                <input id="using_qr" type="checkbox" name="using_radio" checked>
+                                <label for="using_qr">Link to QR code</label>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="existingDevice" class="tab-pane">
+                        <div class="form-label">
+                            <p class="w-100">
+                                <label for="obniz_id">obniz ID</label>
+                                <input type="text" id="obniz_id" class="w-60" placeholder="1234-5678">
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="specific_settings">
+                <input type="checkbox" id="whether_configure" checked>
+                <label for="whether_configure">Write Config</label>
+                <div id="config_switcher" class="switch-container">
+
+                    <div class="radio-container">
+                        <form id="automatic_options">
+                            <p>
+                                <input id="auto_operation" type="radio" name="setting_type" value="same" checked>
+                                <label for="auto_operation">Using Operation</label>
+                            </p>
+                            <p>
+                                <input id="auto_indivisual" type="radio" name="setting_type" value="individual">
+                                <label for="auto_indivisual">Set individually</label>
+                            </p>
+                        </form>
+                    </div>
+
+                    <div id="automatic_settings" class="tab-content">
+                        <div id="same" class="tab-pane active">
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="op_name">Operation name</label>
+                                    <input type="text" id="op_name" class="w-60">
+                                </p>
+                            </div>
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="indication_id">Indication ID</label>
+                                    <input type="text" id="indication_id" class="w-60">
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="individual" class="tab-pane">
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="description">Description</label>
+                                    <input type="text" id="description" class="w-60">
+                                </p>
+                            </div>
+                            <div class="form-label">
+                                <p class="w-100">
+                                    <label for="config_json">Configuration JSON</label>
+                                    <button id="config_json" class="btn btn-outline-primary col-2">Choose File</button>
+                                    <span id="filename">No File Chosen</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card flex-row-container mx-2">
+        <div class="card-body color-gray">
+            <div class="row g-1">
+                <div class="col-auto">
+                    <label for="device"><i class="fab fa-usb"></i> COM:</label>
+                    <select type="text" id="device" class="input-wid10"></select>
+                </div>
+                <div class="col-auto">
+                    <label for="baudrate">Baudrate:</label>
+                    <select type="text" id="baudrate" class="input-wid10">
+                        <option value="115200">115200bps</option>
+                        <option value="921600">921600bps</option>
+                        <option value="1500000" selected>1500000bps</option>
+                    </select>
+                </div>
+                <div class="col-auto ms-auto">
+                    <button type="button" class="btn btn-secondary m-0" data-bs-toggle="modal"
+                            data-bs-target="#eraseModal">Erase
+                    </button>
+                </div>
+
+                <div class="col-auto">
+                    <button id="write_btn" type="button" class="btn btn-primary m-0 input-wid10">Write</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <hr class="w-100">
+    <div class="flex-row-container">
+        <div class="w-80">
+            <h2>Configure Devices via WiFi</h2>
+        </div>
+    </div>
+
+    <div class="flex-row-container">
+        <div class="w-80 flex-row-container align-items-center ms-4">
+            <label for="wifi_config_json">Configuration JSON</label>
+            <button id="wifi_config_json" class="btn ms-auto btn-outline-primary">Choose File</button>
+            <span id="wifi_config_filename" class="me-2" >No File Chosen</span>
+        </div>
+
+        <div class="w-20">
+            <button disabled id="wifi_config_btn" type="button" class="btn btn-primary btn-mid w-80">Configure</button>
+        </div>
+    </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- eraseModal -->
+<div class="modal fade" id="eraseModal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div id="eraseTabContent" class="tab-content">
+          <div id="eraseConfirm" class="tab-pane active">
+
+            <p>Erase the device key and the written OS</p>
+            <div>
+              <button type="button" class="btn btn-secondary" onclick="eraseTest()">OK</button>
+            </div>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Cancel</button>
+            </div>
+
+          </div>
+          <div id="eraseProgress" class="tab-pane">
+            <p>Erase the device key and the written OS</p>
+            <div>
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div id="erased" class="tab-pane">
+            <p>Erase the device key and the written OS</p>
+            <p>Erased.</p>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <div id="eraseError" class="tab-pane">
+            <p>Oops! Some error has occurred.<br></p>
+            <p id="eraseErrorMessage"></p>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script language="javascript">
+  function eraseTest() {
+    $('#eraseConfirm').removeClass("active");
+    $('#eraseProgress').addClass("active");
+
+    window.electron.erase(
+      {device: $('#device').val(), baudrate: $('#baudrate').val()}
+    ).then((error) => {
+      $('#eraseProgress').removeClass("active");
+      if(error){
+        $("#eraseErrorMessage").text(error);
+        $('#eraseError').addClass("active");
+      }else{
+        $('#erased').addClass("active");
+
+      }
+    });
+  }
+
+  $('#eraseModal').on('hidden.bs.modal', function () {
+    $('#erased').removeClass("active");
+    $('#eraseError').removeClass("active");
+    $('#eraseConfirm').addClass("active");
+  })
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="writeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <p>Read the code on the QR sticker.<br>
+        Writing will start automatically after the QR code is read.<br>
+        <img src="./assets/images/pict-scan.gif" width="80%"></p>
+        <div>
+          <input id="qrcode" type="text" class="col col-8"></input>
+        </div>
+        <div>
+          <button id="write_start" type="button" class="btn btn-secondary">OK</button>
+        </div>
+        <div>
+          <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" tabindex="-1" id="wifiConfigModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Configuration Via Wifi</h5>
+            </div>
+            <div class="modal-body">
+                <div class="bg-terminal" style=" padding: 10px 20px; height: 100px" id="terminal2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="wifiConfigJsonCancel">Finish</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <p>
+        Oops! Some error has occurred.<br>
+        Check the message on the Log screen.
+        </p>
+        <p>
+        Please refer to <a href="https://obniz.com/ja/doc/reference/" target="_blank">obniz documentations</a> for troubleshooting.
+        </p>
+        <div>
+          <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="./assets/javascript/console.js"></script>
+<script src="./assets/javascript/wifi_console.js"></script>
+</body>
+</html>
+

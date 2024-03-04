@@ -1,28 +1,84 @@
 {
   "name": "obniz-cli",
-  "version": "0.9.0",
+  "version": "0.10.1-beta.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "./dist/cli.js",
   "keywords": [
     "obniz"
   ],
   "repository": "obniz/obniz-cli",
   "scripts": {
-    "build": "npm run clean && npm run lint && tsc",
+    "pack:mac": "electron-builder --mac --x64",
+    "pack:win64": "electron-builder --win --x64",
+    "packager": "npm run build && npm run pack:mac && npm run pack:win64",
+    "build": "npm run clean && npm run lint && tsc && npm run build:renderer",
+    "build:renderer": "rimraf ./public && gulp sass && gulp ejs && gulp assets",
+    "build-css": "gulp sass",
+    "watch": "gulp",
     "tsc": "tsc",
     "lint": "npm run lint-ts",
     "lint-ts": "tslint --fix -c tslint.json 'src/**/*.ts' ",
     "precommit": "lint-staged && npm run build",
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./dist && rimraf ./app ",
     "local": "npx ts-node src/index.ts",
-    "start": "node dist/index.js",
-    "codegen": "graphql-codegen"
+    "start": "node ./dist/index.js",
+    "electron": "electron ./dist/gui/main.js",
+    "codegen": "graphql-codegen",
+    "install-for-electron": "electron-builder install-app-deps"
   },
   "bin": {
-    "obniz-cli": "./dist/index.js"
+    "obniz-cli": "start.sh"
+  },
+  "build": {
+    "extraMetadata": {
+      "main": "./dist/gui/main.js"
+    },
+    "appId": "com.obniz.app.writer",
+    "productName": "obnizWriter",
+    "buildDependenciesFromSource": true,
+    "npmRebuild": true,
+    "afterSign": "dist/gui/notarize.js",
+    "dmg": {
+      "sign": false
+    },
+    "directories": {
+      "buildResources": "dist",
+      "output": "app"
+    },
+    "files": [
+      "dist/**/*",
+      "public/**/*",
+      "graphql/**/*",
+      "package.json"
+    ],
+    "asar": false,
+    "mac": {
+      "target": "dmg",
+      "icon": "renderer/obnizwriter.icns",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "entitlements.mac.plist",
+      "entitlementsInherit": "entitlements.mac.plist"
+    },
+    "win": {
+      "icon": "renderer/obnizwriter.ico",
+      "target": [
+        "zip",
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerHeaderIcon": "renderer/obnizwriter.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "obniz"
+    }
   },
   "preferGlobal": true,
-  "author": "yukisato <yuki@yuki-sato.com>",
+  "author": "obniz inc",
   "homepage": "https://obniz.com/",
   "license": "MIT",
   "bugs": {
@@ -30,24 +86,6 @@
   },
   "private": false,
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^3.6.0",
-    "eslint-plugin-jasmine": "^2.10.1",
-    "eslint-plugin-prettier": "^2.7.0",
-    "npm-run-all": "^4.1.5",
-    "pkg": "^4.4.0",
-    "prettier": "^1.14.3",
-    "rimraf": "^3.0.0",
-    "ts-node": "^8.8.2",
-    "tslint": "^5.20.1",
-    "tslint-plugin-prettier": "^2.1.0",
-    "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "@graphql-codegen/cli": "^1.13.5",
-    "@graphql-codegen/typescript": "^1.13.5",
-    "@graphql-codegen/typescript-graphql-request": "^1.13.5",
-    "@graphql-codegen/typescript-operations": "^1.13.5",
     "@types/express": "^4.17.13",
     "@types/inquirer": "^7.3.3",
     "@types/node-fetch": "^2.5.12",
@@ -56,7 +94,43 @@
     "@types/semver": "^7.3.8",
     "@types/serialport": "^8.0.2",
     "@types/socket.io": "^2.1.13",
+    "@types/wtfnode": "^0.7.0",
+    "browser-sync": "^2.27.5",
+    "electron": "^18.0.3",
+    "electron-builder": "^23.6.0",
+    "electron-packager": "^15.4.0",
+    "electron-rebuild": "^3.2.7",
+    "electron-notarize": "^1.1.1",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^3.6.0",
+    "eslint-plugin-jasmine": "^2.10.1",
+    "eslint-plugin-prettier": "^2.7.0",
+    "fibers": "^5.0.0",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^8.0.0",
+    "gulp-ejs": "^5.1.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^5.0.0",
+    "npm-run-all": "^4.1.5",
+    "pkg": "^4.4.0",
+    "prettier": "^1.14.3",
+    "rimraf": "^3.0.0",
+    "sass": "^1.38.1",
+    "ts-node": "^8.8.2",
+    "tslint": "^5.20.1",
+    "tslint-plugin-prettier": "^2.1.0",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@9wick/esptool.js": "^0.9.5",
+    "@graphql-codegen/cli": "^1.13.5",
+    "@graphql-codegen/typescript": "^1.13.5",
+    "@graphql-codegen/typescript-graphql-request": "^1.13.5",
+    "@graphql-codegen/typescript-operations": "^1.13.5",
     "chalk": "^4.0.0",
+    "dotenv": "^8.6.0",
+    "electron-log": "^4.4.6",
+    "electron-updater": "^5.0.1",
     "elliptic": "^6.5.2",
     "express": "^4.17.1",
     "get-port": "^5.1.1",
@@ -73,7 +147,18 @@
     "puppeteer-core": "^3.0.4",
     "semver": "^7.3.2",
     "serialport": "^9.0.0",
+    "shell-env": "^4.0.1",
     "socket.io": "^2.3.0",
-    "utility-types": "^3.10.0"
+    "utility-types": "^3.10.0",
+    "wtfnode": "^0.9.1"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "ie >= 11",
+    "iOS >= 9.0",
+    "Android >= 4.2"
+  ],
+  "volta": {
+    "node": "16.20.2"
   }
 }

@@ -24,7 +24,6 @@
     "no-inner-declarations": "warn",
     "no-constant-condition": ["error", {"checkLoops": false}],
     "no-unused-vars": ["error", { "args": "none" }],
-    "no-var": "error",
-    "non-ascii": ["error",{"allowedChars":"°"}]
+    "no-var": "error"
   }
 }

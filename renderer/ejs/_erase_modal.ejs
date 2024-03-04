@@ -1,0 +1,70 @@
+<!-- eraseModal -->
+<div class="modal fade" id="eraseModal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <div id="eraseTabContent" class="tab-content">
+          <div id="eraseConfirm" class="tab-pane active">
+
+            <p>Erase the device key and the written OS</p>
+            <div>
+              <button type="button" class="btn btn-secondary" onclick="eraseTest()">OK</button>
+            </div>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Cancel</button>
+            </div>
+
+          </div>
+          <div id="eraseProgress" class="tab-pane">
+            <p>Erase the device key and the written OS</p>
+            <div>
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div id="erased" class="tab-pane">
+            <p>Erase the device key and the written OS</p>
+            <p>Erased.</p>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <div id="eraseError" class="tab-pane">
+            <p>Oops! Some error has occurred.<br></p>
+            <p id="eraseErrorMessage"></p>
+            <div>
+              <button type="button" class="btn btn-thirdly text-decoration-underline" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script language="javascript">
+  function eraseTest() {
+    $('#eraseConfirm').removeClass("active");
+    $('#eraseProgress').addClass("active");
+
+    window.electron.erase(
+      {device: $('#device').val(), baudrate: $('#baudrate').val()}
+    ).then((error) => {
+      $('#eraseProgress').removeClass("active");
+      if(error){
+        $("#eraseErrorMessage").text(error);
+        $('#eraseError').addClass("active");
+      }else{
+        $('#erased').addClass("active");
+
+      }
+    });
+  }
+
+  $('#eraseModal').on('hidden.bs.modal', function () {
+    $('#erased').removeClass("active");
+    $('#eraseError').removeClass("active");
+    $('#eraseConfirm').addClass("active");
+  })
+</script>

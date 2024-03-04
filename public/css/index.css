@@ -1,0 +1,411 @@
+@charset "UTF-8";
+body {
+  margin: 0;
+  line-height: 1.5;
+  width: 100%;
+  height: 100%;
+  font-family: montserrat;
+  min-width: 980px;
+  min-height: 600px;
+}
+
+.titlebar {
+  padding: 0.5rem 1rem;
+  width: calc(100% - 144px);
+  -webkit-app-region: drag;
+}
+
+.system {
+  display: block;
+  width: 36px;
+  /*枠の大きさ*/
+  height: 46px;
+  /*枠の大きさ*/
+  background: #00A4E3;
+  position: relative;
+}
+.system:hover {
+  background: #0596CE;
+}
+.system.disabled {
+  cursor: default;
+}
+.system.disabled:hover {
+  background: #00A4E3;
+}
+
+.user-menu:before {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  margin-left: 0px;
+  content: "\f007";
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  font-family: "Font Awesome 5 Free";
+}
+.user-menu.disabled:before {
+  content: "" !important;
+}
+
+.user-account, .version-info {
+  text-align: left;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid #dcdcdc;
+  margin-bottom: 0.5rem;
+}
+.user-account ul, .version-info ul {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  padding-left: 0;
+  list-style: none;
+  font-weight: 600;
+}
+.user-account ul ul, .version-info ul ul {
+  font-weight: 400;
+}
+
+.version-info {
+  width: 12rem;
+}
+
+.dropdown-menu-center {
+  left: 50% !important;
+  right: auto !important;
+  text-align: center !important;
+  transform: translate(-50%, 0) !important;
+}
+
+.system-minimize:before {
+  content: "";
+  display: block;
+  width: 15px;
+  height: 1px;
+  background: #FFF;
+  position: absolute;
+  top: calc(50% - 2px);
+  left: 30%;
+}
+
+.system-maximize::before {
+  content: "";
+  display: block;
+  width: 15px;
+  height: 13px;
+  background: transparent;
+  border: 1px solid #FFF;
+  position: absolute;
+  top: 30%;
+  left: calc(30% - 1px);
+}
+.system-maximize::after {
+  content: "";
+  display: block;
+  width: 15px;
+  height: 13px;
+  background: transparent;
+  border: 1px solid #FFF;
+  position: absolute;
+  top: 30%;
+  left: calc(30% - 1px);
+  background: #FFF;
+  height: 1px;
+}
+
+.system-close::before {
+  content: "";
+  display: block;
+  width: 40%;
+  /*バツ線の長さ*/
+  height: 1px;
+  /*バツ線の太さ*/
+  background: #FFF;
+  transform: rotate(45deg);
+  transform-origin: 0% 50%;
+  position: absolute;
+  top: calc(35% - 0.5px);
+  left: 36%;
+}
+.system-close::after {
+  content: "";
+  display: block;
+  width: 40%;
+  /*バツ線の長さ*/
+  height: 1px;
+  /*バツ線の太さ*/
+  background: #FFF;
+  transform: rotate(45deg);
+  transform-origin: 0% 50%;
+  position: absolute;
+  top: calc(35% - 0.5px);
+  left: 36%;
+  transform: rotate(-45deg);
+  transform-origin: 100% 50%;
+  left: auto;
+  right: 36%;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.height100 {
+  height: 100%;
+}
+
+.box-center-middle {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.box-center {
+  margin: 0 auto;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: 0.5rem;
+  margin: auto 0;
+}
+
+.navbar-brand {
+  font-weight: 500;
+  color: #FFF;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1.25rem;
+  padding-top: 0.3125rem;
+  padding-bottom: 0.3125rem;
+  margin-right: 1rem;
+}
+
+.bg-primary, .bg-titlebar {
+  background-color: #00A4E3 !important;
+}
+
+.bg-terminal {
+  background-color: #1D445A;
+}
+
+.btn-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.2rem;
+  box-shadow: none;
+}
+
+input, select {
+  margin: 0.325rem 0;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #dcdcdc;
+  flex: 1 1 auto;
+}
+
+.btn-mid {
+  padding: 0.5rem 2rem;
+  font-size: 1.2rem;
+  box-shadow: none;
+}
+
+.btn-primary {
+  color: #FFF;
+  background-color: #00A4E3;
+  border-color: #00A4E3;
+}
+.btn-primary:hover {
+  background-color: #ffffff;
+  border-color: #00A4E3;
+  color: #00a4e3;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+  margin: 0.5rem;
+}
+
+.btn-secondary {
+  color: #00A4E3;
+  border-color: #00A4E3;
+  background-color: #FFF;
+}
+
+.btn-thirdly {
+  color: #707070;
+  border-color: #DCDCDC;
+  background-color: #DCDCDC;
+}
+.btn-thirdly:hover {
+  background-color: #fff;
+  border-color: #707070;
+  color: #707070;
+}
+
+.titlebar-flex {
+  /*position: relative;*/
+  display: flex;
+  flex-direction: row;
+  z-index: 1500 !important;
+}
+
+.fixed-contents {
+  overflow: scroll;
+  position: fixed;
+  top: 46px;
+  width: 100%;
+  height: calc(100% - 46px);
+}
+
+.signinseparator {
+  border-top: 1px solid #a9aaaa;
+  position: relative;
+  margin: 1rem 0;
+  text-align: center;
+}
+.signinseparator span {
+  background-color: #fff;
+  padding: 0 1rem;
+  position: relative;
+  color: #a9aaaa;
+  top: -1rem;
+}
+
+.w-20 {
+  width: 20%;
+}
+
+.w-30 {
+  width: 30%;
+}
+
+.w-60 {
+  width: 60%;
+}
+
+.w-80 {
+  width: 80%;
+}
+
+.w-90 {
+  width: 90%;
+}
+
+.w-95 {
+  width: 95%;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.input-wid10 {
+  width: 10rem;
+}
+
+.input-wid15 {
+  width: 15rem;
+}
+
+.h-40 {
+  height: 40%;
+}
+
+.text-primary {
+  background-color: transparent;
+  color: #00A4E3;
+  font-size: 1.2rem;
+}
+
+.flex-column-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row-container {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.color-gray {
+  background-color: #F1F1F1;
+}
+
+.form-label {
+  font-weight: 500;
+  vertical-align: middle;
+  margin: 0 1rem;
+}
+.form-label p {
+  margin: 0 1rem;
+  white-space: nowrap;
+}
+.form-label p label {
+  display: inline-block;
+  margin: 0 1rem 0 0;
+  width: 10rem;
+}
+
+.form-inline {
+  display: flex;
+  flex-direction: row;
+}
+.form-inline p label {
+  display: inline-block;
+  width: auto;
+}
+
+.radio-container p {
+  display: inline;
+  margin: 0 1rem;
+  white-space: nowrap;
+}
+
+.card .card-body h2 {
+  font-size: 1.2rem;
+  margin: 0.5rem 1rem;
+}
+.card .card-body h3 {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0.5rem 1.2rem;
+}
+.card .inner-card {
+  padding: 0.75rem 0;
+  margin: 1.2rem;
+}
+.card .inner-card .margin-canceller {
+  margin: 0 -1.2rem;
+}
+.card .inner-card .margin-canceller h3 {
+  margin: 0.5rem 2.2rem;
+}
+.card .card-body .radio-container {
+  margin: 0.5rem 1.5rem;
+}
+
+input[type=checkbox] {
+  margin-left: 2rem;
+}
+
+.tab-content-indent {
+  margin-left: 2rem;
+}
+
+.switch-container {
+  position: relative;
+}
+.switch-container.disabled:after {
+  position: absolute;
+  content: "";
+  background: rgba(255, 255, 255, 0.5);
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}

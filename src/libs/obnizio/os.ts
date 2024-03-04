@@ -22,7 +22,8 @@ export default class OS {
         version,
         app_url,
         bootloader_url,
-        partition_url
+        partition_url,
+        isPublic
       }
     }`;
 
@@ -117,7 +118,7 @@ async function downloadFile(url: string, pathtodownload: string) {
       reject(err);
     });
     fileStream.on("finish", () => {
-      resolve();
+      resolve(null);
     });
   });
 }

@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const serialport_1 = __importDefault(require("serialport"));
 exports.default = async () => {
     let portname;
-    const availablePorts = await findUsbSerials();
+    const serialInfo = await findUsbSerials();
+    const availablePorts = serialInfo.availablePorts;
     if (availablePorts.length === 0) {
         // not found
     }
@@ -20,7 +21,7 @@ exports.default = async () => {
         }
         portname = availablePorts[0];
     }
-    return portname;
+    return { portname, ports: serialInfo.ports };
 };
 async function findUsbSerials() {
     const availablePorts = [];
@@ -43,6 +44,6 @@ async function findUsbSerials() {
             break;
         }
     }
-    return availablePorts;
+    return { availablePorts, ports };
 }
 //# sourceMappingURL=guess.js.map

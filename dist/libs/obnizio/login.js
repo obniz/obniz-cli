@@ -12,11 +12,11 @@ const opn_1 = __importDefault(require("opn"));
 const url_1 = require("./url");
 const WebAppId = process.env.APP_ID || `wa_MjI`;
 const WebAppToken = process.env.APP_TOKEN || `apptoken_X9jp0G6pbmG_XzC5yIKg9_oo7jMIUA3I2IPG58viAsAVyfHmJWmJYgaxnGzcg1kf`;
-exports.default = async (progress) => {
+exports.default = async (progress, app) => {
     return await new Promise(async (resolve, reject) => {
         // start server
         const port = await get_port_1.default();
-        const server = await oauth(port, (err, access_token) => {
+        const server = await oauth(port, (app === null || app === void 0 ? void 0 : app.token) || WebAppToken, (err, access_token) => {
             server.close();
             if (err || !access_token) {
                 reject(err);
@@ -26,11 +26,12 @@ exports.default = async (progress) => {
         });
         progress(`Local Server Created PORT=${port}. Waiting Permission`);
         const redirect_uri = `http://localhost:${port}/code`;
-        const open_url = `${url_1.ObnizIOURL}/login/oauth/authorize?webapp_id=${WebAppId}&redirect_uri=${redirect_uri}`;
+        const open_url = `${url_1.ObnizIOURL}/login/oauth/authorize?webapp_id=${(app === null || app === void 0 ? void 0 : app.id) ||
+            WebAppId}&redirect_uri=${redirect_uri}`;
         opn_1.default(open_url);
     });
 };
-function oauth(port, callback) {
+function oauth(port, appToken, callback) {
     return new Promise((resolve, reject) => {
         let timeout = setTimeout(() => {
             callback(new Error(`Authentication Timeout`), null);
@@ -51,7 +52,7 @@ function oauth(port, callback) {
                 const response = await node_fetch_1.default(url, {
                     method: "post",
                     headers: {
-                        "authorization": `Bearer ${WebAppToken}`,
+                        "authorization": `Bearer ${appToken}`,
                         "Content-Type": "application/json",
                     },
                 });

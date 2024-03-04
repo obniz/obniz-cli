@@ -104,6 +104,7 @@ export default class Serial {
   public async waitFor(key: string, timeout: number | undefined = 20 * 1000) {
     return await new Promise((resolve, reject) => {
       let timeoutTimer: null | ReturnType<typeof setTimeout> = setTimeout(() => {
+        check();
         this._recvCallback = null;
         reject(new Error(`Timeout. waiting for ${key}`));
       }, timeout);
@@ -289,7 +290,6 @@ export default class Serial {
       }
     }
     this.send(`${devicekey}\n`);
-    this.clearReceived();
     try {
       await Promise.race([
         this.waitFor(`obniz id: ${obnizid}`, 10 * 1000),

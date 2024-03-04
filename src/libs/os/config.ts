@@ -10,7 +10,8 @@ import * as Storage from "../storage";
 import Config, { ConfigParam } from "./configure";
 import PreparePort from "./serial/prepare";
 
-import ora from "ora";
+import { getOra } from "../ora-console/getora";
+const ora = getOra();
 
 export async function deviceConfigValidate(args: Readonly<any>, obj: DeepPartial<ConfigParam> = {}, logging = false) {
   const devicekey: any = args.d || args.devicekey;
@@ -151,7 +152,7 @@ export default {
     --operation     operation name for setting.
     --indication    indication name for setting.
   `,
-  async execute(args: any) {
+  async execute(args: any, proceed?: (i: number) => void) {
     // check input first
     await validate(args);
 
@@ -166,13 +167,19 @@ export default {
 
     // set params to obj
     await validate(args, obj, true);
+    if (proceed) {
+      proceed(6);
+    }
 
     if (!obj.configs) {
       // no configuration provided
-      console.log(`No configuration found. exit.`);
+      console.log(`No configuration found. Finished.`);
       return;
     }
 
     await Config(obj);
+    if (proceed) {
+      proceed(7);
+    }
   },
 };

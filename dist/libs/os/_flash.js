@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
 const child_process_1 = __importDefault(require("child_process"));
+const getora_1 = require("../ora-console/getora");
+const ora = getora_1.getOra();
 const os_1 = __importDefault(require("../obnizio/os"));
-const ora_1 = __importDefault(require("ora"));
 function flash(obj) {
     return new Promise(async (resolve, reject) => {
         var _a, _b, _c;
         let status = "connecting";
-        const spinner = ora_1.default(`Flashing obnizOS: preparing file for hardware=${chalk_1.default.green(obj.hardware)} version=${chalk_1.default.green(obj.version)}`).start();
+        const spinner = ora(`Flashing obnizOS: preparing file for hardware=${chalk_1.default.green(obj.hardware)} version=${chalk_1.default.green(obj.version)}`).start();
         if (obj.debugserial) {
             spinner.stop();
         }
@@ -20,7 +21,7 @@ function flash(obj) {
             spinner.text = `Flashing obnizOS: ${progress}`;
         });
         let received = "";
-        const cmd = `esptool.py --chip esp32 --port "${obj.portname}" --baud ${obj.baud} --before default_reset --after hard_reset` +
+        const cmd = `esptool.py --port "${obj.portname}" --baud ${obj.baud} --before default_reset --after hard_reset` +
             ` write_flash` +
             ` -z --flash_mode dio --flash_freq 40m --flash_size detect` +
             ` 0x1000 "${files.bootloader_path}"` +
@@ -38,6 +39,7 @@ function flash(obj) {
         const child = child_process_1.default.exec(cmd);
         (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.setEncoding("utf8");
         (_b = child.stdout) === null || _b === void 0 ? void 0 : _b.on("data", (text) => {
+            // console.log(text);
             if (obj.debugserial) {
                 console.log(text);
                 obj.stdout(text);

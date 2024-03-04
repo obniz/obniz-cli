@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import wtf from "wtfnode";
 
 import chalk from "chalk";
 
@@ -128,7 +129,9 @@ COMMANDS
 };
 
 Args(routes)
-  .then(() => {})
+  .then(() => {
+    // wtf.dump();
+  })
   .catch((e) => {
     console.log(chalk.red(`${e}`));
     process.exit(1);

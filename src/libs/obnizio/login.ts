@@ -10,11 +10,11 @@ const WebAppId = process.env.APP_ID || `wa_MjI`;
 const WebAppToken =
   process.env.APP_TOKEN || `apptoken_X9jp0G6pbmG_XzC5yIKg9_oo7jMIUA3I2IPG58viAsAVyfHmJWmJYgaxnGzcg1kf`;
 
-export default async (progress: (arg: string) => void): Promise<string> => {
+export default async (progress: (arg: string) => void, app?: { id: string; token: string }): Promise<string> => {
   return await new Promise(async (resolve, reject) => {
     // start server
     const port = await getPort();
-    const server = await oauth(port, (err, access_token) => {
+    const server = await oauth(port, app?.token || WebAppToken, (err, access_token) => {
       server.close();
       if (err || !access_token) {
         reject(err);
@@ -26,12 +26,17 @@ export default async (progress: (arg: string) => void): Promise<string> => {
     progress(`Local Server Created PORT=${port}. Waiting Permission`);
 
     const redirect_uri = `http://localhost:${port}/code`;
-    const open_url = `${ObnizIOURL}/login/oauth/authorize?webapp_id=${WebAppId}&redirect_uri=${redirect_uri}`;
+    const open_url = `${ObnizIOURL}/login/oauth/authorize?webapp_id=${app?.id ||
+      WebAppId}&redirect_uri=${redirect_uri}`;
     opn(open_url);
   });
 };
 
-function oauth(port: number, callback: (error: Error | null, token: string | null) => void): Promise<http.Server> {
+function oauth(
+  port: number,
+  appToken: string,
+  callback: (error: Error | null, token: string | null) => void,
+): Promise<http.Server> {
   return new Promise((resolve, reject) => {
     let timeout: null | ReturnType<typeof setTimeout> = setTimeout(() => {
       callback(new Error(`Authentication Timeout`), null);
@@ -55,7 +60,7 @@ function oauth(port: number, callback: (error: Error | null, token: string | nul
         const response = await fetch(url, {
           method: "post",
           headers: {
-            "authorization": `Bearer ${WebAppToken}`,
+            "authorization": `Bearer ${appToken}`,
             "Content-Type": "application/json",
           },
         });
@@ -70,7 +75,7 @@ function oauth(port: number, callback: (error: Error | null, token: string | nul
         callback(null, token);
       } catch (e) {
         res.status(500).send(`Authentication Failed.`);
-        callback(e, null);
+        callback(e as any, null);
         return;
       }
       res.send(`Authentication Success. Close this page and back to your shell.`);

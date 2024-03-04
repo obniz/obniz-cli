@@ -9,7 +9,8 @@ import Config, { validate as validateConfig } from "./config";
 import PreparePort from "./serial/prepare";
 
 import inquirer from "inquirer";
-import ora from "ora";
+import { getOra } from "../ora-console/getora";
+const ora = getOra();
 
 export default {
   help: `Flash obnizOS and configure it
@@ -32,7 +33,7 @@ export default {
     --operation     operation name for setting.
     --indication    indication name for setting.
   `,
-  async execute(args: any) {
+  async execute(args: any, proceed?: (i: number) => void) {
     // If device related configration exist
     // It is not allowed. because device will be created from me.
     if (args.d || args.devicekey || args.i || args.id) {
@@ -45,25 +46,40 @@ export default {
       throw new Error(`You must singin before create device`);
     }
 
+    if (proceed) {
+      proceed(1);
+    }
     // validate first
     await validateConfig(args);
 
+    if (proceed) {
+      proceed(2);
+    }
     // SerialPortSetting
     const obj: any = await PreparePort(args);
     obj.stdout = (text: string) => {
       // process.stdout.write(text);
     };
 
-    // recovery data.
-    const recoveryDeviceString = Storage.get("recovery-device");
+    if (proceed) {
+      proceed(3);
+    }
+
     let device;
-    if (recoveryDeviceString) {
-      const readedDevice = JSON.parse(recoveryDeviceString);
-      const use = await askUseRecovery(readedDevice);
-      if (use) {
-        device = readedDevice;
-      } else {
-        Storage.set("recovery-device", null);
+    if (args.obniz_id) {
+      // recovery without asking when existing obniz id specified
+      device = await Device.get(token, args.obniz_id);
+    } else if (!args.skiprecovery) {
+      // recovery data.
+      const recoveryDeviceString = Storage.get("recovery-device");
+      if (recoveryDeviceString) {
+        const readedDevice = JSON.parse(recoveryDeviceString);
+        const use = await askUseRecovery(readedDevice);
+        if (use) {
+          device = readedDevice;
+        } else {
+          Storage.set("recovery-device", null);
+        }
       }
     }
 
@@ -71,7 +87,7 @@ export default {
 
     // IF manufacturer
     if (args.bindtoken) {
-      qrData = await askSerialToken(device);
+      qrData = await askSerialToken(device, args.serial_token);
     }
 
     // No more asking
@@ -98,7 +114,15 @@ export default {
     }
     obj.version = version;
 
+    if (proceed) {
+      proceed(4);
+    }
+
     await Flash(obj);
+
+    if (proceed) {
+      proceed(5);
+    }
 
     if (device) {
       spinner = ora("obnizCloud:").start();
@@ -140,7 +164,7 @@ export default {
       args.p = undefined;
       args.port = obj.portname; // 万が一この期間にシリアルポートが新たに追加されるとずれる可能性があるので
       args.devicekey = device.devicekey;
-      await Config.execute(args);
+      await Config.execute(args, proceed);
       Storage.set("recovery-device", null);
     } catch (e) {
       chalk.yellow(`obnizID ${device.id} device key and information was sotred in recovery file`);
@@ -171,14 +195,19 @@ async function askUseRecovery(device: any) {
   return answer.yesno === "yes";
 }
 
-async function askSerialToken(device: any) {
-  const answer = await inquirer.prompt([
-    {
-      type: "input",
-      name: "serialtoken",
-      message: `Scan QR Code. Waiting...`,
-    },
-  ]);
+async function askSerialToken(device: any, serial_token?: string) {
+  let answer: any;
+  if (serial_token) {
+    answer = { serialtoken: serial_token };
+  } else {
+    answer = await inquirer.prompt([
+      {
+        type: "input",
+        name: "serialtoken",
+        message: `Scan QR Code. Waiting...`,
+      },
+    ]);
+  }
 
   const spinner = ora("Serial: Binding...").start();
   try {

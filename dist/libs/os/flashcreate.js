@@ -1,13 +1,25 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const { URL } = require("url");
@@ -20,7 +32,8 @@ const _flash_1 = __importDefault(require("./_flash"));
 const config_1 = __importStar(require("./config"));
 const prepare_1 = __importDefault(require("./serial/prepare"));
 const inquirer_1 = __importDefault(require("inquirer"));
-const ora_1 = __importDefault(require("ora"));
+const getora_1 = require("../ora-console/getora");
+const ora = getora_1.getOra();
 exports.default = {
     help: `Flash obnizOS and configure it
 
@@ -42,7 +55,7 @@ exports.default = {
     --operation     operation name for setting.
     --indication    indication name for setting.
   `,
-    async execute(args) {
+    async execute(args, proceed) {
         // If device related configration exist
         // It is not allowed. because device will be created from me.
         if (args.d || args.devicekey || args.i || args.id) {
@@ -53,36 +66,51 @@ exports.default = {
         if (!token) {
             throw new Error(`You must singin before create device`);
         }
+        if (proceed) {
+            proceed(1);
+        }
         // validate first
         await config_1.validate(args);
+        if (proceed) {
+            proceed(2);
+        }
         // SerialPortSetting
         const obj = await prepare_1.default(args);
         obj.stdout = (text) => {
             // process.stdout.write(text);
         };
-        // recovery data.
-        const recoveryDeviceString = Storage.get("recovery-device");
+        if (proceed) {
+            proceed(3);
+        }
         let device;
-        if (recoveryDeviceString) {
-            const readedDevice = JSON.parse(recoveryDeviceString);
-            const use = await askUseRecovery(readedDevice);
-            if (use) {
-                device = readedDevice;
-            }
-            else {
-                Storage.set("recovery-device", null);
+        if (args.obniz_id) {
+            // recovery without asking when existing obniz id specified
+            device = await device_1.default.get(token, args.obniz_id);
+        }
+        else if (!args.skiprecovery) {
+            // recovery data.
+            const recoveryDeviceString = Storage.get("recovery-device");
+            if (recoveryDeviceString) {
+                const readedDevice = JSON.parse(recoveryDeviceString);
+                const use = await askUseRecovery(readedDevice);
+                if (use) {
+                    device = readedDevice;
+                }
+                else {
+                    Storage.set("recovery-device", null);
+                }
             }
         }
         let qrData = null;
         // IF manufacturer
         if (args.bindtoken) {
-            qrData = await askSerialToken(device);
+            qrData = await askSerialToken(device, args.serial_token);
         }
         // No more asking
         let hardware;
         let version;
         let spinner;
-        spinner = ora_1.default("obnizOS:").start();
+        spinner = ora("obnizOS:").start();
         // hardware
         hardware = args.h || args.hardware || defaults_1.default.HARDWARE;
         obj.hardware = hardware;
@@ -97,13 +125,19 @@ exports.default = {
             spinner.succeed(`obnizOS: decided hardware=${chalk_1.default.green(hardware)} version=${chalk_1.default.green(version)}`);
         }
         obj.version = version;
+        if (proceed) {
+            proceed(4);
+        }
         await _flash_1.default(obj);
+        if (proceed) {
+            proceed(5);
+        }
         if (device) {
-            spinner = ora_1.default("obnizCloud:").start();
+            spinner = ora("obnizCloud:").start();
             spinner.succeed(`obnizCloud: using recovery device obnizID=${chalk_1.default.green(device.id)} description=${chalk_1.default.green(device.description)} region=${chalk_1.default.green(device.region)}`);
         }
         else {
-            spinner = ora_1.default("obnizCloud: creating device on obnizCloud...").start();
+            spinner = ora("obnizCloud: creating device on obnizCloud...").start();
             try {
                 // Device Creation Setting
                 const region = args.r || args.region || "jp";
@@ -131,7 +165,7 @@ exports.default = {
             args.p = undefined;
             args.port = obj.portname; // 万が一この期間にシリアルポートが新たに追加されるとずれる可能性があるので
             args.devicekey = device.devicekey;
-            await config_1.default.execute(args);
+            await config_1.default.execute(args, proceed);
             Storage.set("recovery-device", null);
         }
         catch (e) {
@@ -161,15 +195,21 @@ async function askUseRecovery(device) {
     ]);
     return answer.yesno === "yes";
 }
-async function askSerialToken(device) {
-    const answer = await inquirer_1.default.prompt([
-        {
-            type: "input",
-            name: "serialtoken",
-            message: `Scan QR Code. Waiting...`,
-        },
-    ]);
-    const spinner = ora_1.default("Serial: Binding...").start();
+async function askSerialToken(device, serial_token) {
+    let answer;
+    if (serial_token) {
+        answer = { serialtoken: serial_token };
+    }
+    else {
+        answer = await inquirer_1.default.prompt([
+            {
+                type: "input",
+                name: "serialtoken",
+                message: `Scan QR Code. Waiting...`,
+            },
+        ]);
+    }
+    const spinner = ora("Serial: Binding...").start();
     try {
         const url = new URL(answer.serialtoken);
         const paths = url.pathname.split("/");
