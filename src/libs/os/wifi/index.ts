@@ -1,8 +1,10 @@
 import chalk from "chalk";
+import { exec } from "child_process";
+import { existsSync } from "fs";
 import wifi from "node-wifi";
 import { Ora } from "ora";
 import { getOra } from "../../ora-console/getora.js";
-import { networkInterfaces } from "os";
+import { networkInterfaces, platform } from "os";
 
 const ora = getOra();
 
@@ -383,7 +385,65 @@ export default class WiFi {
     return options;
   }
 
+  private needsMacOSFallbackScan(): boolean {
+    if (platform() !== "darwin") return false;
+    return !existsSync(
+      "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport",
+    );
+  }
+
+  private scanObnizWiFiViaMacOS(
+    callback: (error: Error | null, networks: { ssid: string }[]) => void,
+  ): void {
+    exec(
+      "system_profiler SPAirPortDataType",
+      { encoding: "utf-8" },
+      (error, stdout) => {
+        if (error) {
+          callback(error, []);
+          return;
+        }
+        const obnizNetworks: { ssid: string }[] = [];
+        const seen = new Set<string>();
+        const re = /\bobniz-[0-9]{8}\b/g;
+        let match;
+        while ((match = re.exec(stdout)) !== null) {
+          if (!seen.has(match[0])) {
+            seen.add(match[0]);
+            obnizNetworks.push({ ssid: match[0] });
+          }
+        }
+        callback(null, obnizNetworks);
+      },
+    );
+  }
+
   private scanObnizWiFi(timeout: number, signal?: AbortSignal): Promise<any> {
+    if (this.needsMacOSFallbackScan()) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error(`Timeout. Cannot find any connectable obniz.`));
+        }, timeout);
+
+        signal?.addEventListener("abort", () => {
+          clearTimeout(timer);
+          reject(new Error(`Aborted.`));
+        });
+
+        this.scanObnizWiFiViaMacOS(
+          (error: Error | null, networks: { ssid: string }[]) => {
+            if (error) {
+              clearTimeout(timer);
+              reject(error);
+              return;
+            }
+            clearTimeout(timer);
+            resolve(networks);
+          },
+        );
+      });
+    }
+
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         reject(new Error(`Timeout. Cannot find any connectable obniz.`));
