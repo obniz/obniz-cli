@@ -1,14 +1,16 @@
 import chalk from "chalk";
+import { execFile } from "child_process";
 import wifi from "node-wifi";
 import { Ora } from "ora";
 import { getOra } from "../../ora-console/getora.js";
-import { networkInterfaces } from "os";
+import { networkInterfaces, platform } from "os";
 
 const ora = getOra();
 
 export default class WiFi {
   public stdout: any;
   public onerror: any;
+  private macOSWifiDevice?: string;
 
   constructor(obj: { stdout: any; onerror: any }) {
     this.stdout = obj.stdout;
@@ -54,7 +56,7 @@ export default class WiFi {
             // Connect access point
             spinner.text = `Found ${chalk.green(network.ssid)}. Connecting...`;
             try {
-              await wifi.connect({ ssid: network.ssid });
+              await this.connectToSsid(network.ssid);
             } catch (e) {
               throw new Error(
                 `Connection to ${chalk.green(network.ssid)} failed`,
@@ -383,7 +385,46 @@ export default class WiFi {
     return options;
   }
 
+  private isMacOS(): boolean {
+    return platform() === "darwin";
+  }
+
+  private async scanObnizWiFiViaMacOS(): Promise<{ ssid: string }[]> {
+    try {
+      const stdout = await this.scanViaCoreWlan();
+      return this.extractObnizSsids(stdout);
+    } catch (error) {
+      const stdout = await this.execFilePromise("system_profiler", [
+        "SPAirPortDataType",
+      ]);
+      return this.extractObnizSsids(stdout);
+    }
+  }
+
   private scanObnizWiFi(timeout: number, signal?: AbortSignal): Promise<any> {
+    if (this.isMacOS()) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error(`Timeout. Cannot find any connectable obniz.`));
+        }, timeout);
+
+        signal?.addEventListener("abort", () => {
+          clearTimeout(timer);
+          reject(new Error(`Aborted.`));
+        });
+
+        this.scanObnizWiFiViaMacOS()
+          .then((networks) => {
+            clearTimeout(timer);
+            resolve(networks);
+          })
+          .catch((error: Error) => {
+            clearTimeout(timer);
+            reject(error);
+          });
+      });
+    }
+
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         reject(new Error(`Timeout. Cannot find any connectable obniz.`));
@@ -411,6 +452,106 @@ export default class WiFi {
         resolve(obnizwifis);
       });
     });
+  }
+
+  private async connectToSsid(ssid: string): Promise<void> {
+    if (this.isMacOS()) {
+      await this.connectViaNetworksetup(ssid);
+      return;
+    }
+    await wifi.connect({ ssid });
+  }
+
+  private async connectViaNetworksetup(ssid: string): Promise<void> {
+    const device = await this.getMacOSWifiDevice();
+    await this.execFilePromise("networksetup", [
+      "-setairportnetwork",
+      device,
+      ssid,
+    ]);
+  }
+
+  private async getMacOSWifiDevice(): Promise<string> {
+    if (this.macOSWifiDevice) {
+      return this.macOSWifiDevice;
+    }
+    const stdout = await this.execFilePromise("networksetup", [
+      "-listallhardwareports",
+    ]);
+    const lines = stdout.split(/\r?\n/);
+    let inWifiBlock = false;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        inWifiBlock = false;
+        continue;
+      }
+      if (trimmed.startsWith("Hardware Port:")) {
+        inWifiBlock = trimmed.includes("Wi-Fi") || trimmed.includes("AirPort");
+        continue;
+      }
+      if (inWifiBlock && trimmed.startsWith("Device:")) {
+        const device = trimmed.split(":")[1]?.trim();
+        if (device) {
+          this.macOSWifiDevice = device;
+          return device;
+        }
+      }
+    }
+    throw new Error("Wi-Fi device not found");
+  }
+
+  private execFilePromise(command: string, args: string[]): Promise<string> {
+    return new Promise((resolve, reject) => {
+      execFile(
+        command,
+        args,
+        { encoding: "utf-8" },
+        (error, stdout, stderr) => {
+          if (error) {
+            reject(
+              new Error(
+                stderr?.toString()?.trim() || error.message || "Command failed",
+              ),
+            );
+            return;
+          }
+          resolve(stdout);
+        },
+      );
+    });
+  }
+
+  private extractObnizSsids(output: string): { ssid: string }[] {
+    const obnizNetworks: { ssid: string }[] = [];
+    const seen = new Set<string>();
+    const re = /\bobniz-[0-9]{8}\b/g;
+    let match;
+    while ((match = re.exec(output)) !== null) {
+      if (!seen.has(match[0])) {
+        seen.add(match[0]);
+        obnizNetworks.push({ ssid: match[0] });
+      }
+    }
+    return obnizNetworks;
+  }
+
+  private scanViaCoreWlan(): Promise<string> {
+    const script = [
+      "import CoreWLAN",
+      "if let iface = CWWiFiClient.shared().interface() {",
+      "  do {",
+      "    let networks = try iface.scanForNetworks(withName: nil)",
+      "    for net in networks {",
+      "      if let ssid = net.ssid {",
+      "        print(ssid)",
+      "      }",
+      "    }",
+      "  } catch {",
+      "  }",
+      "}",
+    ].join("\n");
+    return this.execFilePromise("swift", ["-e", script]);
   }
 }
 
